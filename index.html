@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI-SOL (hey asshole) — Meme Coin</title>
+  <meta name="description" content="AI-SOL is the roast-powered meme coin. Coming soon." />
+  <link rel="icon" href="ai-sol-logo.png" />
+  <style>
+    :root{ --accent:#00e6ff; --text:#e9f1f1; --muted:#9fb2b5; --bg1:#070b0f; --bg2:#0a1f25; --bg3:#101a33; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0; font-family:ui-sans-serif,system-ui,Arial; color:var(--text);
+      display:flex; align-items:center; justify-content:center; text-align:center; padding:32px;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(0,230,255,.15), transparent 60%),
+                  radial-gradient(1000px 700px at -10% 100%, rgba(160,0,255,.15), transparent 60%),
+                  linear-gradient(120deg,var(--bg1),var(--bg2),var(--bg3));
+      background-size:400% 400%; animation:bgmove 18s ease-in-out infinite;
+    }
+    @keyframes bgmove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .card{width:min(820px,100%); padding:28px 22px; border:1px solid rgba(255,255,255,.08);
+      background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
+    .logo-wrap{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:10px}
+    .logo-img{width:min(220px,48vw); height:auto; border-radius:16px}
+    h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
+    .tag{display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
+      color:#0b1116; background:var(--accent); border-radius:999px; font-weight:700; text-transform:uppercase;}
+    p{margin:0 auto 16px; max-width:58ch; color:var(--muted); font-size:clamp(14px,2.5vw,16px)}
+    .cta-row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 10px}
+    button,input[type="email"]{font:inherit; border-radius:10px; border:1px solid rgba(255,255,255,.12); padding:12px 16px; background:#0a1218; color:var(--text)}
+    button{cursor:pointer; border-color:rgba(0,230,255,.35)}
+    button.primary{background:var(--accent); color:#001217; border-color:transparent; font-weight:800}
+    button:hover{filter:brightness(1.08)}
+    .roast-box{margin:18px auto 8px; padding:16px; min-height:72px; max-width:620px; background:#0a1218; border:1px dashed rgba(255,255,255,.18); border-radius:12px; display:flex; align-items:center; justify-content:center; line-height:1.4}
+    .tiny{font-size:12px; color:var(--muted)}
+    form{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+    input[type="email"]{min-width:240px}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <div class="logo-wrap">
+      <img class="logo-img" src="ai-sol-logo.png" alt="AI-SOL logo saying Hey Asshole" />
+      <div class="tag">AI-SOL • meme coin</div>
+      <h1 id="title">hey, asshole — we’re almost live</h1>
+    </div>
+
+    <p>AI-SOL is a roast-powered meme coin. We keep it playful by default — flip “Spicy Mode” if you want extra heat.</p>
+
+    <div style="margin-top:8px">
+      <label class="tiny"><input id="spicy" type="checkbox" /> Spicy Mode</label>
+    </div>
+
+    <div class="cta-row">
+      <button class="primary" id="roastBtn">Roast me</button>
+      <button id="copyBtn" title="Copy last roast">Copy</button>
+    </div>
+
+    <div class="roast-box" id="roastBox" aria-live="polite">Press “Roast me” to get a taste.</div>
+
+    <div class="tiny" style="margin-top:6px">Want launch updates? Join the list.</div>
+    <!-- Replace FORM_ENDPOINT below with your Formspree/Getform endpoint later -->
+    <form id="signup" action="#" method="POST" onsubmit="alert('Email capture not wired yet.'); return false;">
+      <input type="email" name="email" placeholder="you@example.com" required />
+      <button type="submit">Notify me</button>
+    </form>
+
+    <p class="tiny" style="margin-top:12px">© <span id="year"></span> TapNSlap • <a href="https://tapnslap.ai" rel="noopener">tapnslap.ai</a></p>
+  </main>
+
+  <script>
+    const PG = [
+      "You’re like a loading spinner — all show, no progress.",
+      "Even CAPTCHA thinks you’re a bot. A slow one.",
+      "Your crypto picks aged like warm milk.",
+      "You clicked 'I agree' faster than you read the meme.",
+      "You bring the vibes of an unindexed blog.",
+      "Your Wi-Fi password is probably 'password'.",
+      "You diversify like: 100% vibes, 0% research."
+    ];
+    const SPICY = [
+      "You’re a rug pull with a profile picture.",
+      "Your takes have less backing than your bank account.",
+      "If effort were gas, you’re on fumes and still idling.",
+      "You minted confidence but forgot the utility.",
+      "Your alpha leaks like a colander."
+    ];
+    const roastBox = document.getElementById("roastBox");
+    const spicy = document.getElementById("spicy");
+    const year = document.getElementById("year");
+    year.textContent = new Date().getFullYear();
+
+    function rand(a){ return a[Math.floor(Math.random()*a.length)] }
+    let lastRoast = "";
+    function roast(){
+      const line = spicy.checked ? rand([...PG, ...SPICY]) : rand(PG);
+      lastRoast = line; roastBox.textContent = line;
+    }
+    document.getElementById("roastBtn").addEventListener("click", roast);
+    document.getElementById("copyBtn").addEventListener("click", () => {
+      if (!lastRoast) lastRoast = roastBox.textContent.trim();
+      navigator.clipboard.writeText(lastRoast).then(()=>{
+        const old = roastBox.textContent; roastBox.textContent = "Copied!";
+        setTimeout(()=>roastBox.textContent = old, 700);
+      });
+    });
+  </script>
+</body>
+</html>
