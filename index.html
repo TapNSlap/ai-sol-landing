@@ -45,11 +45,18 @@
 }
 
 /* Tablet (421–1024px) */
-@media (min-width:421px) and (max-width:1024px){
-  .card{ padding:20px; }
-  .logo-wrap{ padding-top:12px; }
-  .logo-img{
-    width:min(34vw, 260px);         /* bigger, like before */
+@media (min-width:421px) and (max-width:1024px) {
+  .card {
+    padding: 20px;
+  }
+  .logo-wrap {
+    padding-top: 20px; /* was 12px, give more breathing room */
+    display: flex;
+    justify-content: center; /* centers vertically if needed */
+  }
+  .logo-img {
+    width: min(34vw, 260px);
+    height: auto;
   }
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
