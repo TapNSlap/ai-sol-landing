@@ -21,23 +21,23 @@
     .card{width:min(820px,100%); padding:28px 22px; border:1px solid rgba(255,255,255,.08);
       background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
     .logo-wrap{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:10px}
-    ./* replace your current .logo-img and mobile block with this */
+    /* Keep these general styles */
 .logo-img{
   display:block;
-  width:clamp(160px, 62vw, 240px); /* smaller on tiny screens */
-  max-width:100%;
   height:auto;
-  object-fit:contain;   /* never crops */
+  object-fit:contain;      /* never crops */
   border-radius:16px;
-  margin-inline:auto;
+  margin: 6px auto 10px;   /* add a little breathing room */
+  max-width:100%;
 }
-.card{ overflow:visible; }  /* just in case any overflow was clipping */
 
-@media (max-width:420px){
-  body{ padding:18px; }
-  .card{ padding:16px; }    /* give the logo more breathing room */
-  h1{ font-size:9vw; }
-  .roast-box{ margin:12px auto; }
+/* Tighter mobile rules */
+@media (max-width: 420px){
+  .card{ padding:16px; overflow:visible; }
+  .logo-img{
+    width:56vw;       /* was larger; shrink on phones */
+    max-width:200px;  /* hard cap for tiny screens */
+  }
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
     .tag{display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
