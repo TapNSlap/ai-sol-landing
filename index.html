@@ -33,10 +33,13 @@
 
 /* Tighter mobile rules */
 @media (max-width: 420px){
-  .card{ padding:16px; overflow:visible; }
+  .card{ 
+    padding:16px; 
+    overflow:visible; 
+  }
   .logo-img{
-    width:48vw;       /* was larger; shrink on phones */
-    max-width:200px;  /* hard cap for tiny screens */
+    width:50vw;        /* shrink more on iPhone */
+    max-width:180px;   /* hard cap so it never gets too big */
   }
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
