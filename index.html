@@ -21,27 +21,35 @@
     .card{width:min(820px,100%); padding:28px 22px; border:1px solid rgba(255,255,255,.08);
       background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
     .logo-wrap{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:10px}
-    /* Keep these general styles */
+    /* Logo: single source of truth */
 .logo-img{
   display:block;
+  width:clamp(160px, 28vw, 320px);  /* scales nicely desktop→tablet */
   height:auto;
-  object-fit:contain;      /* never crops */
-  border-radius:16px;
-  margin: 6px auto 10px;   /* add a little breathing room */
   max-width:100%;
-  max-height: 40vh; /* keeps it from taking over the screen on short devices */
-}
+  object-fit:contain;               /* never crops */
+  border-radius:16px;
+  margin:12px auto 10px;
 }
 
-/* Tighter mobile rules */
-@media (max-width: 420px){
-  .card{ 
-    padding:16px; 
-    overflow:visible; 
-  }
+/* prevent any clipping by the card */
+.card{ overflow:visible; }
+
+/* Phone (≤420px) */
+@media (max-width:420px){
+  .card{ padding:16px; }
+  .logo-wrap{ padding-top:10px; }
   .logo-img{
-    width:50vw;        /* shrink more on iPhone */
-    max-width:180px;   /* hard cap so it never gets too big */
+    width:min(42vw, 160px);         /* smaller so full circle fits */
+  }
+}
+
+/* Tablet (421–1024px) */
+@media (min-width:421px) and (max-width:1024px){
+  .card{ padding:20px; }
+  .logo-wrap{ padding-top:12px; }
+  .logo-img{
+    width:min(34vw, 260px);         /* tuned for iPad widths */
   }
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
