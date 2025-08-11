@@ -97,7 +97,7 @@
 
     <div class="tiny" style="margin-top:6px">Want launch updates? Join the list.</div>
     <!-- Replace FORM_ENDPOINT below with your Formspree/Getform endpoint later -->
-    <form id="signup" action="#" method="POST" onsubmit="alert('Email capture not wired yet.'); return false;">
+    <form id="signup" action="https://formspree.io/f/manbaakq" method="POST" onsubmit="alert('Email capture not wired yet.'); return false;">
       <input type="email" name="email" placeholder="you@example.com" required />
       <button type="submit">Notify me</button>
     </form>
@@ -141,6 +141,32 @@
         setTimeout(()=>roastBox.textContent = old, 700);
       });
     });
-  </script>
+  <script>
+const form = document.getElementById('signup');
+const btn  = document.getElementById('notifyBtn');
+const msg  = document.getElementById('msg');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      msg.textContent = 'Thanks — you’re on the list!';
+      form.reset();
+    } else {
+      msg.textContent = 'Hmm, that didn’t work. Try again in a minute.';
+    }
+  } catch {
+    msg.textContent = 'Network hiccup — please try again.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Notify me';
+  }
+});
+</script>
 </body>
 </html>
