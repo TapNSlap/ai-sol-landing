@@ -121,8 +121,7 @@ form.addEventListener('submit', async (e) => {
     });
 
     if (res.ok) {
-      msg.textContent = "Thanks — you're on the list!";
-      form.reset();
+      window.location.href = "thankyou.html";
     } else {
       // Try to read Formspree's JSON error (rate limit, etc.)
       let error = "Hmm, that didn’t work. Try again in a minute.";
