@@ -170,33 +170,7 @@ form.addEventListener('submit', async (e) => {
         const old = roastBox.textContent; roastBox.textContent = "Copied!";
         setTimeout(()=>roastBox.textContent = old, 700);
       });
-    });
-  <script>
-const form = document.getElementById('signup');
-const btn  = document.getElementById('notifyBtn');
-const msg  = document.getElementById('msg');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    const res = await fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: { 'Accept': 'application/json' }
-    });
-    if (res.ok) {
-      msg.textContent = 'Thanks — you’re on the list!';
-      form.reset();
-    } else {
-      msg.textContent = 'Hmm, that didn’t work. Try again in a minute.';
-    }
-  } catch {
-    msg.textContent = 'Network hiccup — please try again.';
-  } finally {
-    btn.disabled = false; btn.textContent = 'Notify me';
-  }
-});
+    }); 
 </script>
 </body>
 </html>
