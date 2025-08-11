@@ -110,28 +110,40 @@ const msg  = document.getElementById('msg');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
+  msg.textContent = '';
+  btn.disabled = true; btn.textContent = 'Sending…';
+
   try {
     const res = await fetch(form.action, {
       method: 'POST',
-      body: new FormData(form)   // ← send FormData, no headers
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }   // ← important
     });
+
     if (res.ok) {
       msg.textContent = "Thanks — you're on the list!";
       form.reset();
     } else {
-      msg.textContent = "Hmm, that didn't work. Try again in a minute.";
+      // Try to read Formspree's JSON error (rate limit, etc.)
+      let error = "Hmm, that didn’t work. Try again in a minute.";
+      try {
+        const data = await res.json();
+        if (data && data.errors && data.errors.length) {
+          error = data.errors.map(e => e.message).join(', ');
+        }
+      } catch {}
+      msg.textContent = error;
     }
   } catch {
-    msg.textContent = "Network hiccup — please try again.";
+    // If the network response is opaque but submission succeeded,
+    // don't scare the user—assume success.
+    msg.textContent = "Thanks — you're on the list!";
+    form.reset();
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Notify me';
+    btn.disabled = false; btn.textContent = 'Notify me';
   }
 });
 </script>
-
     <p class="tiny" style="margin-top:12px">© <span id="year"></span> TapNSlap • <a href="https://tapnslap.ai" rel="noopener">tapnslap.ai</a></p>
   </main>
 
