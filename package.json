@@ -1,0 +1,9 @@
+{
+  "name": "ai-sol-landing",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "dependencies": {
+    "twitter-api-v2": "^1.16.0"
+  }
+}
