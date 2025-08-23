@@ -1,45 +1,62 @@
 import { TwitterApi } from "twitter-api-v2";
 
-// --- simple rotating content queue ---
-// Option A: hardcode an array here…
-const QUEUE = [
-  "gm from AI-SOL 🌞 building on Solana.",
-  "Community > everything. Tell us what to post next. ⚡",
-  "AI-SOL tip: Consistency beats intensity. 1% better daily.",
-  "Memes + markets = momentum. 🚀 #AiSol",
-  "Wen utility? Wen community! 🧠🤝",
+const FALLBACK = [
+  "gm from AI-SOL ☀️ #AiSol #Solana",
+  "Building on Solana, memeing all the way 🚀 #AiSol",
+  "Community > everything 🤝 #AiSol"
 ];
 
-// If you prefer, move these lines into /data/posts.json and import it.
+const SYSTEM_PROMPT = `
+You are the voice of AI-SOL (a playful meme coin on Solana).
+Style: punchy, meme-like, hype but not spammy.
+Rules: <=250 chars, 1-2 hashtags (#AiSol, #Solana). No links or @mentions.
+Return only the tweet text.
+`;
 
-let index = 0; // stateless fallback; see NOTE below
+async function generatePost() {
+  try {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        temperature: 0.9,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: "Write a new post for right now." }
+        ]
+      })
+    });
+    const data = await r.json();
+    let text = data?.choices?.[0]?.message?.content?.trim()
+             || FALLBACK[Math.floor(Math.random() * FALLBACK.length)];
+    if (text.length > 270) text = text.slice(0, 267) + "...";
+    return text;
+  } catch {
+    return FALLBACK[Math.floor(Math.random() * FALLBACK.length)];
+  }
+}
 
 export default async function handler(req, res) {
+  // ✅ require the secret
+  const headerSecret = req.headers["x-cron-secret"];
+  const querySecret = (req.query?.secret || "").toString();
+  if (headerSecret !== process.env.CRON_SECRET && querySecret !== process.env.CRON_SECRET) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
-    // 1) protect the endpoint so randoms can’t hit it
-    const secret = req.headers["x-cron-secret"];
-    if (secret !== process.env.CRON_SECRET) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+    const text = await generatePost();
 
-    // 2) pick the next post
-    // NOTE: Serverless is stateless; for a simple rotation we can use time-based index:
-    const now = new Date();
-    // change divisor if your QUEUE length changes
-    index = Math.floor(now.getUTCDate() + now.getUTCHours()) % QUEUE.length;
-    const text = QUEUE[index];
+    // allow dry run
+    if (req.query?.dry) return res.status(200).json({ ok: true, dry: true, text });
 
-    // 3) post the tweet via OAuth 1.0a (you already have these env vars)
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
       appSecret: process.env.X_API_KEY_SECRET,
       accessToken: process.env.X_ACCESS_TOKEN,
       accessSecret: process.env.X_ACCESS_TOKEN_SECRET,
     });
-
-    const result = await client.v2.tweet(text);
-    return res.status(200).json({ ok: true, posted: text, result });
-  } catch (e) {
-    return res.status(500).json({ ok: false, error: e?.data || e?.message || "fail" });
-  }
-}
