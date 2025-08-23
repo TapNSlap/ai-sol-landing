@@ -2,25 +2,36 @@
 const { TwitterApi } = require("twitter-api-v2");
 
 const FALLBACK = [
-  "gm from AI-SOL ☀️ #AiSol #Solana",
-  "Building on Solana, memeing all the way 🚀 #AiSol",
-  "Community > everything 🤝 #AiSol"
+  "gm losers ☕ Did you buy $AISOL yet or just watching? #AiSol #Solana",
+  "If you’re not rocking AI-SOL merch, are you even part of the cult? 🤡 #AiSol",
+  "Meme coin, meme life. Buy the dip, roast the haters. $AISOL 🚀"
 ];
 
-const SYSTEM_PROMPT = `
-You are the voice of AI-SOL (a playful meme coin on Solana).
-Style: punchy, meme-like, hype but not spammy.
-Rules: <=250 chars, 1-2 hashtags (#AiSol, #Solana). No links or @mentions.
-Return only the tweet text.
+function getPrompt(hourUTC) {
+  // Morning (12–17 UTC = 7AM–12PM Central)
+  if (hourUTC >= 12 && hourUTC < 17) {
+    return `
+You are AI-SOL, a sarcastic meme coin on Solana that roasts people.
+Morning vibe: clown on people who just woke up late, call them broke,
+say "gm" in a cocky/funny way. Plug $AISOL and maybe merch.
+Keep it under 250 characters, 1-2 hashtags (#AiSol #Solana).
 `;
-
-async function generatePost() {
-  // If no key, skip OpenAI and return fallback
-  if (!process.env.OPENAI_API_KEY) {
-    return FALLBACK[Math.floor(Math.random() * FALLBACK.length)];
   }
 
+  // Evening (23–04 UTC = 6PM–11PM Central + midnight fun)
+  return `
+You are AI-SOL, a savage, funny asshole meme coin.
+Evening vibe: roast bag holders, flex about $AISOL gains,
+drop meme insults, plug merch, and be entertaining.
+Keep it short, spicy, under 250 chars. Use hashtags.
+`;
+}
+
+async function generatePost() {
   try {
+    const now = new Date();
+    const prompt = getPrompt(now.getUTCHours());
+
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -29,23 +40,22 @@ async function generatePost() {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.9,
+        temperature: 0.95,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: "Write a new post for right now." },
+          { role: "system", content: prompt },
+          { role: "user", content: "Write a fresh AI-SOL tweet." },
         ],
       }),
     });
 
     if (!r.ok) {
-      const errText = await r.text();
-      console.error("OpenAI API error:", r.status, errText);
-      throw new Error("OpenAI API call failed");
+      console.error("OpenAI error:", await r.text());
+      return FALLBACK[Math.floor(Math.random() * FALLBACK.length)];
     }
 
     const data = await r.json();
     let text = data?.choices?.[0]?.message?.content?.trim();
-    if (!text) throw new Error("No text returned");
+    if (!text) return FALLBACK[Math.floor(Math.random() * FALLBACK.length)];
     if (text.length > 270) text = text.slice(0, 267) + "...";
     return text;
   } catch (e) {
@@ -61,18 +71,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // DRY mode: never call OpenAI, just report status
+  // Dry run just previews without tweeting
   if (req.query?.dry) {
-    return res.status(200).json({
-      ok: true,
-      mode: "dry",
-      openaiKeyPresent: !!process.env.OPENAI_API_KEY,
-    });
+    const text = await generatePost();
+    return res.status(200).json({ ok: true, mode: "dry", text });
   }
 
   try {
     const text = await generatePost();
-
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
       appSecret: process.env.X_API_KEY_SECRET,
@@ -83,6 +89,6 @@ module.exports = async function handler(req, res) {
     const result = await client.v2.tweet(text);
     return res.status(200).json({ ok: true, text, result });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: e?.data || e?.message || "post failed" });
+    return res.status(500).json({ ok: false, error: e?.message || "tweet failed" });
   }
 };
