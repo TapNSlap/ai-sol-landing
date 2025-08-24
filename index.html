@@ -22,64 +22,42 @@
       background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
     .logo-wrap{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:10px}
     /* Logo: single source of truth */
-.logo-img{
-  display:block;
-  width:clamp(160px, 28vw, 320px);  /* scales nicely desktop→tablet */
-  height:auto;
-  max-width:100%;
-  object-fit:contain;               /* never crops */
-  border-radius:16px;
-  margin:12px auto 10px;
+/* ===== Logo + card (global) ===== */
+.logo-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding-top:20px;      /* breathing room */
+  overflow:visible;      /* never clip the logo */
 }
 
-/* prevent any clipping by the card */
-.card{ overflow:visible; }
+.logo-img{
+  display:block;
+  margin:0 auto 16px;
+  width:clamp(160px, 28vw, 320px);  /* responsive desktop→tablet */
+  max-width:100%;
+  height:auto;
+  object-fit:contain;               /* never crops */
+  border-radius:16px;
+}
 
-/* Phone (≤420px) */
+.card{
+  overflow:visible !important;      /* stop top-edge cropping */
+}
+
+/* ===== Phone (≤420px) ===== */
 @media (max-width:420px){
   .card{ padding:16px; }
   .logo-wrap{ padding-top:10px; }
-  .logo-img{
-    width:min(30vw, 160px);         /* smaller so full circle fits */
-  }
+  .logo-img{ width:min(160px, 60vw); }  /* small but readable */
 }
 
-/* Tablet (421–1024px) */
-@media (min-width:421px) and (max-width:1024px) {
-  .card {
-    padding: 20px;
-  }
-  .logo-wrap {
-    padding-top: 20px; /* was 12px, give more breathing room */
-    display: flex;
-    justify-content: center; /* centers vertically if needed */
-  }
-  .logo-img {
-    width: min(34vw, 260px);
-    height: auto;
-  }
-  /* --- Logo fixes --- */
-.logo-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 20px;    /* breathing room so logo never touches top */
-  overflow: visible;    /* prevents cropping */
-}
-
-.logo-img {
-  display: block;
-  margin: 0 auto 16px;  /* centers logo, adds bottom space */
-  width: clamp(160px, 28vw, 320px); /* responsive scaling */
-  height: auto;
-  object-fit: contain;  /* ensures full logo shows */
-}
-
-/* Ensure the main card never chops content */
-.card {
-  overflow: visible !important;
-}
+/* ===== Tablet (421–1024px) ===== */
+@media (min-width:421px) and (max-width:1024px){
+  .card{ padding:20px; }
+  .logo_wrap{}
+  .logo-img{ width:min(260px, 34vw); }
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
     .tag{display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
