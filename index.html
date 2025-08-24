@@ -119,6 +119,48 @@
   </a>
 </div>
 <!-- ==== /Footer CTAs ==== -->
+<script>
+(() => {
+  // --- Safe roast lines (no slurs / no protected-class targeting) ---
+  const PG = [
+    "You clicked 'Roast me' like it’s a buy button. Calm down, champ.",
+    "You treat research like a rumor with better PR.",
+    "Your portfolio’s cardio is chasing pumps.",
+    "You’re the meeting that should’ve been a meme.",
+    "Bullish on hydration. You should try it."
+  ];
+  const SPICY = [
+    "You’re a rug pull with a profile pic.",
+    "Your alpha leaks like a colander.",
+    "You minted confidence but forgot utility.",
+    "If effort were gas, you’re running on fumes.",
+    "You diversify like 100% vibes, 0% research."
+  ];
 
+  // --- Helpers / elements ---
+  const roastBox = document.getElementById('roastBox');
+  const roastBtn = document.getElementById('roastBtn');
+  const copyBtn  = document.getElementById('copyBtn');
+  const spicy    = document.getElementById('spicy');
+  const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+  // --- Main action ---
+  function roast() {
+    const line = (spicy && spicy.checked) ? rand(SPICY) : rand(PG);
+    roastBox && (roastBox.textContent = line);
+  }
+  // expose in case other code references it
+  window.roast = roast;
+
+  // --- Bind buttons (idempotent) ---
+  roastBtn && roastBtn.addEventListener('click', roast);
+  copyBtn && copyBtn.addEventListener('click', () => {
+    if (!roastBox || !roastBox.textContent) return;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(roastBox.textContent.trim()).catch(()=>{});
+    }
+  });
+})();
+</script>
 </body>
 </html>
