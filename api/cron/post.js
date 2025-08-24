@@ -1,77 +1,95 @@
 // api/cron/post.js
 const { TwitterApi } = require("twitter-api-v2");
 
-// ---------- FALLBACK BANKS (used if OpenAI fails) ----------
-const MERCH_LINES = [
-  "Cold? Buy the hoodie, clown. You’ll look 69% less broke. 🖕 #AiSol #Solana",
-  "Still wearing basic tees? Imagine being that guy. Upgrade to $AISOL drip. 👕 #AiSol",
-  "This mug flips you off daily. Just like the market. ☕🖕 #AiSol",
-  "Not financial advice—just fashion alpha. The AI-SOL cap does numbers. 🧢 #AiSol",
-];
-const GM_LINES = [
-  "gm degenerates ☀️ hydrate, then acquire $AISOL. #AiSol #Solana",
-  "gm mortals—memes > meetings. You’re welcome. #AiSol",
-  "gm. I move markets with personality. What’s your superpower? #AiSol",
-];
-const ROAST_LINES = [
-  "If you missed the pump, at least don’t miss the merch. Stay winning somehow. #AiSol",
-  "Your exit liquidity called—it said ‘thank you’. Try $AISOL next time. #AiSol",
-  "I’m not bullish, I’m busy. Keep up. #AiSol #Solana",
+// ----------- CONFIG -----------
+const SITE = process.env.SITE_URL || "https://ai-sol.tapnslap.ai";
+const MEDIA = [
+  { url: `${SITE}/merch/hoodie.png`, type: "image/png" },
+  { url: `${SITE}/merch/tee.png`,    type: "image/png" },
+  { url: `${SITE}/merch/mug.png`,    type: "image/png" },
+  { url: `${SITE}/merch/hat.png`,    type: "image/png" }
 ];
 
-// Pick a random from an array
+// Merch probability (0.0–1.0). At 0.15 ≈ 15%.
+const MERCH_PROB = 0.15;
+
+// ----------- FALLBACK LINES -----------
+const FB = {
+  gm: [
+    "gm degenerates ☀️ hydrate, then acquire $AISOL. #AiSol #Solana",
+    "gm. Memes > meetings. You’re welcome. #AiSol",
+    "Rise, cry, buy. Repeat. #AiSol #Solana"
+  ],
+  roast: [
+    "You bought the top again? Congrats, you’re my exit liquidity. 🖕 $AISOL #Solana",
+    "I’m not bullish, I’m busy. Keep up. #AiSol",
+    "Cope harder. I’m the main character. $AISOL"
+  ],
+  market: [
+    "Red candles? Relax, you weren’t gonna make it anyway. 🚽 $AISOL",
+    "Green day and you’re still poor. Tragic. #AiSol",
+    "Charts up, IQ down. Perfect combo. $AISOL"
+  ],
+  degen: [
+    "47 tabs open, 0 profits. Close Discord and touch grass. #AiSol",
+    "Sleep is for whales. You? You’re bait. $AISOL",
+    "Hustle harder or get roasted daily. #AiSol"
+  ],
+  merch: [
+    "Still trading in your mom’s basement? At least look decent. Hoodie soon. 🖕 #AiSol",
+    "Basic tee? Couldn’t be me. Drip incoming. #AiSol",
+    "This mug flips you off every morning. Soulmate unlocked. ☕🖕 #AiSol"
+  ]
+};
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// ---------- PROMPT LOGIC ----------
+// ----------- PROMPTS -----------
 const BASE_RULES = `
-You are AI-SOL, a cheeky meme coin on Solana. Voice: sarcastic, playful roast.
+You are AI-SOL, a sarcastic meme coin on Solana. Voice: funny, cocky, roasty "asshole"—but playful.
 Constraints:
-- 1–2 sentences, <=250 chars.
+- 1–2 sentences, <=230 chars for body (we append a link).
 - 1–2 hashtags (#AiSol, #Solana).
-- No @mentions or links.
-- No hate/slurs/harassment toward protected classes; keep it playful roast.
-- No financial promises/guarantees.
-Return ONLY the tweet text.
+- No @mentions or links in your text (we append site).
+- No slurs/hate/harassment of protected classes. Punch up at behavior, not identity.
+- No financial guarantees.
+Return ONLY the body text (no link).
 `;
 
-function promptFor(topic) {
-  if (topic === "merch") {
-    return `${BASE_RULES}
-Task: Write a short roasty promo for AI-SOL merch (hoodie, tee, mug, or hat). Tease the reader like a funny jerk, but keep it light and safe.`;
+function topicPrompt(topic) {
+  switch (topic) {
+    case "gm":
+      return `${BASE_RULES}\nTask: Morning 'gm' jab. Light roast, degen energy.`;
+    case "market":
+      return `${BASE_RULES}\nTask: Market/trader roast. Pumps/dumps, cope/comedy.`;
+    case "degen":
+      return `${BASE_RULES}\nTask: Degenerate lifestyle roast (late nights, Discord addicts, fake gurus).`;
+    case "merch":
+      return `${BASE_RULES}\nTask: Rare merch plug as a roast (hoodie/tee/mug/hat). Tease, don't hard-sell.`;
+    default:
+      return `${BASE_RULES}\nTask: General spicy roast about AI-SOL / the timeline.`;
   }
-  if (topic === "gm") {
-    return `${BASE_RULES}
-Task: Morning "gm" energy with a playful jab at the reader. Optional light nod to $AISOL or Solana.`;
-  }
-  // default roast
-  return `${BASE_RULES}
-Task: Evening-style spicy meme roast about AI-SOL / degen life. Keep it entertaining and short.`;
 }
 
-// Map UTC hour to default topic
-function pickTopicByTime(hourUTC) {
-  // Morning block (13–17 UTC ~ 8am–12pm Central) → gm
-  if (hourUTC >= 13 && hourUTC < 17) return "gm";
-  // Evening block (00–04 UTC ~ 6pm–10pm Central) → roast
-  return "roast";
+// ----------- TOPIC SELECTION -----------
+function chooseTopic(override) {
+  if (override) return override; // gm|roast|market|degen|merch
+
+  const h = new Date().getUTCHours();
+
+  // ~15% chance for merch, regardless of time
+  if (Math.random() < MERCH_PROB) return "merch";
+
+  // Morning bias → gm; Evening bias → roast/market/degen
+  if (h >= 13 && h < 17) return "gm"; // ~8a–12p Central
+  const pool = ["roast", "market", "degen"];
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
-// 1/3 chance to force merch (unless user overrides)
-function maybeForceMerch(topic) {
-  if (topic) return topic; // explicit override
-  return Math.floor((Date.now() / 1000) % 3) === 0 ? "merch" : pickTopicByTime(new Date().getUTCHours());
-}
-
-async function generatePost(topicOverride) {
-  // Decide topic (merch|gm|roast)
-  const topic = maybeForceMerch(topicOverride);
-  const system = promptFor(topic);
-
-  // If no OpenAI key, use fallbacks immediately
+// ----------- OPENAI GENERATION -----------
+async function generateBody(topic) {
   if (!process.env.OPENAI_API_KEY) {
-    if (topic === "merch") return pick(MERCH_LINES);
-    if (topic === "gm") return pick(GM_LINES);
-    return pick(ROAST_LINES);
+    // Fallback if no key
+    return pick(FB[topic] || FB.roast);
   }
 
   try {
@@ -85,59 +103,80 @@ async function generatePost(topicOverride) {
         model: "gpt-4o-mini",
         temperature: 0.95,
         messages: [
-          { role: "system", content: system },
-          { role: "user", content: "Write a fresh AI-SOL tweet now." },
+          { role: "system", content: topicPrompt(topic) },
+          { role: "user", content: "Write 1 new tweet body now." }
         ],
       }),
     });
-
     if (!r.ok) throw new Error(`OpenAI ${r.status} ${await r.text()}`);
     const data = await r.json();
-    let text = data?.choices?.[0]?.message?.content?.trim();
-    if (!text) throw new Error("No text returned");
-    if (text.length > 270) text = text.slice(0, 267) + "...";
-    return text;
+    let body = data?.choices?.[0]?.message?.content?.trim();
+    if (!body) throw new Error("No text");
+    if (body.length > 230) body = body.slice(0, 227) + "...";
+    return body;
   } catch (e) {
-    console.error("OpenAI fail:", e.message || e);
-    if (topic === "merch") return pick(MERCH_LINES);
-    if (topic === "gm") return pick(GM_LINES);
-    return pick(ROAST_LINES);
+    console.error("OpenAI fail:", e?.message || e);
+    return pick(FB[topic] || FB.roast);
   }
 }
 
-// ---------- HANDLER ----------
+// ----------- MEDIA HELPERS -----------
+async function fetchImageBuffer(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`Image fetch failed ${r.status}`);
+  const ab = await r.arrayBuffer();
+  return Buffer.from(ab);
+}
+
+// ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
   const headerSecret = req.headers["x-cron-secret"];
-  const querySecret = (req.query?.secret || "").toString();
+  const querySecret  = (req.query?.secret || "").toString();
   if (headerSecret !== process.env.CRON_SECRET && querySecret !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const topic = (req.query?.topic || "").toString().toLowerCase(); // optional override: merch|gm|roast
+  const override = (req.query?.topic || "").toString().toLowerCase(); // gm|roast|market|degen|merch
+  const topic = chooseTopic(override);
 
-  // Dry-run: preview without posting
+  // Dry run = preview only
   if (req.query?.dry) {
-    const text = await generatePost(topic);
+    const body = await generateBody(topic);
+    const text = `${body} ${SITE}`;
     return res.status(200).json({
       ok: true,
       mode: "dry",
-      topic: topic || "auto",
+      topic,
       openaiKeyPresent: !!process.env.OPENAI_API_KEY,
-      text,
+      willAttachMedia: topic === "merch",
+      text
     });
   }
 
   try {
-    const text = await generatePost(topic);
+    const body = await generateBody(topic);
+    const text = `${body} ${SITE}`;
+
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
       appSecret: process.env.X_API_KEY_SECRET,
       accessToken: process.env.X_ACCESS_TOKEN,
       accessSecret: process.env.X_ACCESS_TOKEN_SECRET,
     });
-    const result = await client.v2.tweet(text);
-    return res.status(200).json({ ok: true, topic: topic || "auto", text, result });
+
+    // Attach image ONLY for merch topic
+    let media_ids;
+    if (topic === "merch" && MEDIA.length) {
+      const m = MEDIA[Math.floor(Math.random() * MEDIA.length)];
+      const buf = await fetchImageBuffer(m.url);
+      const mediaId = await client.v1.uploadMedia(buf, { mimeType: m.type });
+      media_ids = [mediaId];
+    }
+
+    const result = await client.v2.tweet(text, media_ids ? { media: { media_ids } } : undefined);
+    return res.status(200).json({ ok: true, topic, text, media_ids, result });
   } catch (e) {
+    console.error("tweet error:", e?.data || e?.message || e);
     return res.status(500).json({ ok: false, error: e?.data || e?.message || "tweet failed" });
   }
 };
