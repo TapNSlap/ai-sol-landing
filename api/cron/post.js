@@ -240,19 +240,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(resultPayload);
   }
 };
-   // Attach image ONLY for merch topic
-    let media_ids;
-    if (topic === "merch" && MEDIA.length) {
-      try {
-        const m = MEDIA[Math.floor(Math.random() * MEDIA.length)];
-        const buf = await fetchImageBuffer(m.url);
-        const mediaId = await client.v1.uploadMedia(buf, { mimeType: m.type });
-        media_ids = [mediaId];
-      } catch (mErr) {
-        console.error("[MEDIA UPLOAD ERROR]", mErr?.data || mErr?.message || mErr);
-      }
-    }
-
     const result = await client.v2.tweet(
       text,
       media_ids ? { media: { media_ids } } : undefined
