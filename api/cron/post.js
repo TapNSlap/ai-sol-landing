@@ -116,15 +116,24 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  // ✅ Allow either Vercel scheduled runs (“Run” button too) OR your secret
   const isVercelCron = !!req.headers["x-vercel-cron"];
   const headerSecret = req.headers["x-cron-secret"];
   const querySecret  = (req.query?.secret || "").toString();
-  const ok = isVercelCron || headerSecret === process.env.CRON_SECRET || querySecret === process.env.CRON_SECRET;
-  if (!ok) return res.status(401).json({ error: "Unauthorized" });
 
-  const override = (req.query?.topic || "").toString().toLowerCase(); // gm|roast|market|degen|merch
-  const topic = chooseTopic(override);
+  const ok =
+    isVercelCron ||
+    headerSecret === process.env.CRON_SECRET ||
+    querySecret === process.env.CRON_SECRET;
+
+  if (!ok) {
+    console.log("[CRON unauthorized]", {
+      vercelHeader: !!req.headers["x-vercel-cron"],
+      headerSecret,
+      querySecret,
+      envSecretSet: !!process.env.CRON_SECRET,
+    });
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   // Dry run = preview only
   if (req.query?.dry) {
