@@ -116,31 +116,25 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  // --- TEMP: bypass auth to confirm everything else works ---
-  console.log("[CRON TEMP] bypassing auth for test run");
- // ✅ Accept EITHER: Vercel cron header OR your CRON_SECRET via header/query
-  const isVercelCron = !!req.headers['x-vercel-cron'];   // double bang, not single !
+  // Allow if it's a Vercel scheduled run (x-vercel-cron)
+  // OR if the caller proves knowledge of CRON_SECRET (header or query).
+  const isVercelCron = Boolean(req.headers['x-vercel-cron']);
   const headerSecret = req.headers['x-cron-secret'];
   const querySecret  = (req.query?.secret || '').toString();
 
-  const ok =
-    isVercelCron ||
-    headerSecret === process.env.CRON_SECRET ||
-    querySecret === process.env.CRON_SECRET;
-
-  if (!ok) {
-    console.log("[CRON unauthorized]", {
-      vercelHeader: !!req.headers['x-vercel-cron'],
-      headerSecret: !!req.headers['x-cron-secret'],
-      querySecret: !!(req.query?.secret),
-      envSecretSet: !!process.env.CRON_SECRET,
-    });
+  if (
+    !(isVercelCron ||
+      headerSecret === process.env.CRON_SECRET ||
+      querySecret  === process.env.CRON_SECRET)
+  ) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  if (!ok) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  // ---- your existing logic continues here ----
+  const override = (req.query?.topic || '').toString().toLowerCase(); // gm|roast|market|degen|merch
+  const topic = chooseTopic(override);
+  // (your dry-run block starts next; leave it as-is)
+}
 
   // Dry run = preview only
   if (req.query?.dry) {
