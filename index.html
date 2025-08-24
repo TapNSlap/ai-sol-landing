@@ -58,6 +58,28 @@
     width: min(34vw, 260px);
     height: auto;
   }
+  /* --- Logo fixes --- */
+.logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 20px;    /* breathing room so logo never touches top */
+  overflow: visible;    /* prevents cropping */
+}
+
+.logo-img {
+  display: block;
+  margin: 0 auto 16px;  /* centers logo, adds bottom space */
+  width: clamp(160px, 28vw, 320px); /* responsive scaling */
+  height: auto;
+  object-fit: contain;  /* ensures full logo shows */
+}
+
+/* Ensure the main card never chops content */
+.card {
+  overflow: visible !important;
+}
 }
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
     .tag{display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
