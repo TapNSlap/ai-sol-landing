@@ -1,20 +1,16 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "crons": [
-    {
-      "path": "/api/cron/post",
-      "schedule": "0 14 * * *"
-    },
-    {
-      "path": "/api/cron/post",
-      "schedule": "0 1 * * *"
-    }
+
+  "rewrites": [
+    { "source": "/merch", "destination": "/merch.html" },
+    { "source": "/merch.html", "destination": "/merch.html" },
+    { "source": "/thankyou", "destination": "/thankyou.html" },
+    { "source": "/thankyou.html", "destination": "/thankyou.html" }
   ],
-  "routes": [
-    { "src": "/merch", "dest": "/merch.html" },
-    { "src": "/merch.html", "dest": "/merch.html" },
-    { "src": "/thankyou", "dest": "/thankyou.html" },
-    { "src": "/thankyou.html", "dest": "/thankyou.html" }
+
+  "crons": [
+    { "path": "/api/cron/post", "schedule": "0 14 * * *" },
+    { "path": "/api/cron/post", "schedule": "0 1 * * *" }
   ]
 }
