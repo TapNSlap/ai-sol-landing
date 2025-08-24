@@ -136,8 +136,9 @@ module.exports = async function handler(req, res) {
   // (your dry-run block starts next; leave it as-is)
 }
 
-  // Dry run = preview only
-  if (req.query?.dry) {
+ // Dry run = preview only (never throw)
+if (req.query?.dry) {
+  try {
     const body = await generateBody(topic);
     const text = `${body} ${SITE}`;
     return res.status(200).json({
@@ -148,7 +149,20 @@ module.exports = async function handler(req, res) {
       willAttachMedia: topic === "merch",
       text
     });
+  } catch (e) {
+    console.error("[DRY RUN ERROR]", e?.stack || e?.message || e);
+    // Always respond in dry-run, even if generation failed
+    const text = `${pick(FB[topic] || FB.roast)} ${SITE}`;
+    return res.status(200).json({
+      ok: true,
+      mode: "dry-fallback",
+      topic,
+      openaiKeyPresent: !!process.env.OPENAI_API_KEY,
+      willAttachMedia: false,
+      text
+    });
   }
+}
 
   try {
     const body = await generateBody(topic);
