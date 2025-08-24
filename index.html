@@ -18,50 +18,43 @@
       background-size:400% 400%; animation:bgmove 18s ease-in-out infinite;
     }
     @keyframes bgmove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .card{width:min(820px,100%); padding:28px 22px; border:1px solid rgba(255,255,255,.08);
-      background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
-    .logo-wrap{display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:10px}
-    /* Logo: single source of truth */
-/* ===== Logo + card (global) ===== */
-.logo-wrap{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding-top:20px;      /* breathing room */
-  overflow:visible;      /* never clip the logo */
-}
 
-.logo-img{
-  display:block;
-  margin:0 auto 16px;
-  width:clamp(160px, 28vw, 320px);  /* responsive desktop→tablet */
-  max-width:100%;
-  height:auto;
-  object-fit:contain;               /* never crops */
-  border-radius:16px;
-}
+    .card{
+      width:min(820px,100%); padding:28px 22px; border:1px solid rgba(255,255,255,.08);
+      background:rgba(8,13,18,.55); backdrop-filter: blur(8px); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+      overflow:visible !important; /* prevent top-edge clipping */
+    }
 
-.card{
-  overflow:visible !important;      /* stop top-edge cropping */
-}
+    /* ===== Logo area (global) ===== */
+    .logo-wrap{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:10px; margin-bottom:10px; padding-top:20px; /* breathing room */
+      overflow:visible; /* never clip the logo */
+    }
+    .logo-img{
+      display:block; margin:0 auto 16px;
+      width:clamp(160px, 28vw, 320px); /* responsive desktop→tablet */
+      max-width:100%; height:auto; object-fit:contain; border-radius:16px;
+    }
 
-/* ===== Phone (≤420px) ===== */
-@media (max-width:420px){
-  .card{ padding:16px; }
-  .logo-wrap{ padding-top:10px; }
-  .logo-img{ width:min(160px, 60vw); }  /* small but readable */
-}
+    /* Phone (≤420px) */
+    @media (max-width:420px){
+      .card{ padding:16px; }
+      .logo-wrap{ padding-top:10px; }
+      .logo-img{ width:min(160px, 60vw); } /* small but readable */
+    }
 
-/* ===== Tablet (421–1024px) ===== */
-@media (min-width:421px) and (max-width:1024px){
-  .card{ padding:20px; }
-  .logo_wrap{}
-  .logo-img{ width:min(260px, 34vw); }
-}
+    /* Tablet (421–1024px) */
+    @media (min-width:421px) and (max-width:1024px){
+      .card{ padding:20px; }
+      .logo-img{ width:min(260px, 34vw); }
+    }
+
     h1{margin:0 0 8px; font-size:clamp(28px,5vw,46px)}
-    .tag{display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
-      color:#0b1116; background:var(--accent); border-radius:999px; font-weight:700; text-transform:uppercase;}
+    .tag{
+      display:inline-block; margin-bottom:8px; padding:6px 10px; font-size:12px; letter-spacing:.1em;
+      color:#0b1116; background:var(--accent); border-radius:999px; font-weight:700; text-transform:uppercase;
+    }
     p{margin:0 auto 16px; max-width:58ch; color:var(--muted); font-size:clamp(14px,2.5vw,16px)}
     .cta-row{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:16px 0 10px}
     button,input[type="email"]{font:inherit; border-radius:10px; border:1px solid rgba(255,255,255,.12); padding:12px 16px; background:#0a1218; color:var(--text)}
@@ -98,69 +91,72 @@
     <div class="tiny" style="margin-top:6px">Want launch updates? Join the list.</div>
     <!-- Replace FORM_ENDPOINT below with your Formspree/Getform endpoint later -->
     <form id="signup" action="https://formspree.io/f/manbaakq" method="POST" novalidate onsubmit="window.location.href='thankyou.html'; return false;">
-  <input type="email" name="email" placeholder="you@example.com" required />
-  <button type="submit" id="notifyBtn">Notify me</button>
-</form>
-<div id="msg" class="tiny" role="status" aria-live="polite"></div>
-<!-- ==== Footer CTAs ==== -->
-<div style="text-align:center;margin:40px 0 60px;clear:both;">
-  <a href="merch.html"
-     style="display:inline-block;margin:8px 10px;background:#1DA1F2;color:#fff;
-            padding:14px 24px;border-radius:10px;text-decoration:none;
-            font-weight:700;font-size:18px;">
-     Preview our merch
-  </a>
+      <input type="email" name="email" placeholder="you@example.com" required />
+      <button type="submit" id="notifyBtn">Notify me</button>
+    </form>
+    <div id="msg" class="tiny" role="status" aria-live="polite"></div>
 
-  <a href="https://x.com/AISOL2774653" target="_blank" rel="noopener"
-     style="display:inline-block;margin:8px 10px;background:#111;color:#fff;
-            padding:14px 24px;border-radius:10px;text-decoration:none;
-            font-weight:700;font-size:18px;border:1px solid #2a2f36;">
-    Follow AI-SOL on X
-  </a>
-</div>
-<!-- ==== /Footer CTAs ==== -->
-<script>
-(() => {
-  // --- Safe roast lines (no slurs / no protected-class targeting) ---
-  const PG = [
-    "You clicked 'Roast me' like it’s a buy button. Calm down, champ.",
-    "You treat research like a rumor with better PR.",
-    "Your portfolio’s cardio is chasing pumps.",
-    "You’re the meeting that should’ve been a meme.",
-    "Bullish on hydration. You should try it."
-  ];
-  const SPICY = [
-    "You’re a rug pull with a profile pic.",
-    "Your alpha leaks like a colander.",
-    "You minted confidence but forgot utility.",
-    "If effort were gas, you’re running on fumes.",
-    "You diversify like 100% vibes, 0% research."
-  ];
+    <!-- ==== Footer CTAs ==== -->
+    <div style="text-align:center;margin:40px 0 60px;clear:both;">
+      <a href="merch.html"
+         style="display:inline-block;margin:8px 10px;background:#1DA1F2;color:#fff;
+                padding:14px 24px;border-radius:10px;text-decoration:none;
+                font-weight:700;font-size:18px;">
+         Preview our merch
+      </a>
 
-  // --- Helpers / elements ---
-  const roastBox = document.getElementById('roastBox');
-  const roastBtn = document.getElementById('roastBtn');
-  const copyBtn  = document.getElementById('copyBtn');
-  const spicy    = document.getElementById('spicy');
-  const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      <a href="https://x.com/AISOL2774653" target="_blank" rel="noopener"
+         style="display:inline-block;margin:8px 10px;background:#111;color:#fff;
+                padding:14px 24px;border-radius:10px;text-decoration:none;
+                font-weight:700;font-size:18px;border:1px solid #2a2f36;">
+         Follow AI-SOL on X
+      </a>
+    </div>
+    <!-- ==== /Footer CTAs ==== -->
 
-  // --- Main action ---
-  function roast() {
-    const line = (spicy && spicy.checked) ? rand(SPICY) : rand(PG);
-    roastBox && (roastBox.textContent = line);
-  }
-  // expose in case other code references it
-  window.roast = roast;
+    <script>
+    (() => {
+      // --- Safe roast lines (no slurs / no protected-class targeting) ---
+      const PG = [
+        "You clicked 'Roast me' like it’s a buy button. Calm down, champ.",
+        "You treat research like a rumor with better PR.",
+        "Your portfolio’s cardio is chasing pumps.",
+        "You’re the meeting that should’ve been a meme.",
+        "Bullish on hydration. You should try it."
+      ];
+      const SPICY = [
+        "You’re a rug pull with a profile pic.",
+        "Your alpha leaks like a colander.",
+        "You minted confidence but forgot utility.",
+        "If effort were gas, you’re running on fumes.",
+        "You diversify like 100% vibes, 0% research."
+      ];
 
-  // --- Bind buttons (idempotent) ---
-  roastBtn && roastBtn.addEventListener('click', roast);
-  copyBtn && copyBtn.addEventListener('click', () => {
-    if (!roastBox || !roastBox.textContent) return;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(roastBox.textContent.trim()).catch(()=>{});
-    }
-  });
-})();
-</script>
+      // --- Helpers / elements ---
+      const roastBox = document.getElementById('roastBox');
+      const roastBtn = document.getElementById('roastBtn');
+      const copyBtn  = document.getElementById('copyBtn');
+      const spicy    = document.getElementById('spicy');
+      const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+      // --- Main action ---
+      function roast() {
+        const line = (spicy && spicy.checked) ? rand(SPICY) : rand(PG);
+        roastBox && (roastBox.textContent = line);
+      }
+      // expose in case other code references it
+      window.roast = roast;
+
+      // --- Bind buttons (idempotent) ---
+      roastBtn && roastBtn.addEventListener('click', roast);
+      copyBtn && copyBtn.addEventListener('click', () => {
+        if (!roastBox || !roastBox.textContent) return;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(roastBox.textContent.trim()).catch(()=>{});
+        }
+      });
+    })();
+    </script>
+  </main>
 </body>
 </html>
