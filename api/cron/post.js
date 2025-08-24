@@ -57,41 +57,27 @@ Return ONLY the body text (no link).
 
 function topicPrompt(topic) {
   switch (topic) {
-    case "gm":
-      return `${BASE_RULES}\nTask: Morning 'gm' jab. Light roast, degen energy.`;
-    case "market":
-      return `${BASE_RULES}\nTask: Market/trader roast. Pumps/dumps, cope/comedy.`;
-    case "degen":
-      return `${BASE_RULES}\nTask: Degenerate lifestyle roast (late nights, Discord addicts, fake gurus).`;
-    case "merch":
-      return `${BASE_RULES}\nTask: Rare merch plug as a roast (hoodie/tee/mug/hat). Tease, don't hard-sell.`;
-    default:
-      return `${BASE_RULES}\nTask: General spicy roast about AI-SOL / the timeline.`;
+    case "gm":     return `${BASE_RULES}\nTask: Morning 'gm' jab. Light roast, degen energy.`;
+    case "market": return `${BASE_RULES}\nTask: Market/trader roast. Pumps/dumps, cope/comedy.`;
+    case "degen":  return `${BASE_RULES}\nTask: Degenerate lifestyle roast (late nights, Discord addicts, fake gurus).`;
+    case "merch":  return `${BASE_RULES}\nTask: Rare merch plug as a roast (hoodie/tee/mug/hat). Tease, don't hard-sell.`;
+    default:       return `${BASE_RULES}\nTask: General spicy roast about AI-SOL / the timeline.`;
   }
 }
 
 // ----------- TOPIC SELECTION -----------
 function chooseTopic(override) {
   if (override) return override; // gm|roast|market|degen|merch
-
   const h = new Date().getUTCHours();
-
-  // ~15% chance for merch, regardless of time
-  if (Math.random() < MERCH_PROB) return "merch";
-
-  // Morning bias → gm; Evening bias → roast/market/degen
-  if (h >= 13 && h < 17) return "gm"; // ~8a–12p Central
+  if (Math.random() < MERCH_PROB) return "merch"; // ~15% anytime
+  if (h >= 13 && h < 17) return "gm";             // ~8a–12p Central
   const pool = ["roast", "market", "degen"];
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // ----------- OPENAI GENERATION -----------
 async function generateBody(topic) {
-  if (!process.env.OPENAI_API_KEY) {
-    // Fallback if no key
-    return pick(FB[topic] || FB.roast);
-  }
-
+  if (!process.env.OPENAI_API_KEY) return pick(FB[topic] || FB.roast);
   try {
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -130,11 +116,12 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
+  // ✅ Allow either Vercel scheduled runs (“Run” button too) OR your secret
+  const isVercelCron = !!req.headers["x-vercel-cron"];
   const headerSecret = req.headers["x-cron-secret"];
   const querySecret  = (req.query?.secret || "").toString();
-  if (headerSecret !== process.env.CRON_SECRET && querySecret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  const ok = isVercelCron || headerSecret === process.env.CRON_SECRET || querySecret === process.env.CRON_SECRET;
+  if (!ok) return res.status(401).json({ error: "Unauthorized" });
 
   const override = (req.query?.topic || "").toString().toLowerCase(); // gm|roast|market|degen|merch
   const topic = chooseTopic(override);
@@ -159,7 +146,7 @@ module.exports = async function handler(req, res) {
 
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
-      appSecret: process.env.X_API_KEY_SECRET,
+      appSecret: process.env.X_API_KEY_SECRET,         // keep your existing env names
       accessToken: process.env.X_ACCESS_TOKEN,
       accessSecret: process.env.X_ACCESS_TOKEN_SECRET,
     });
