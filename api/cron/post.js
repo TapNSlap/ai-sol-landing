@@ -116,8 +116,7 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  // Allow if it's a Vercel scheduled run (x-vercel-cron)
-  // OR if the caller proves knowledge of CRON_SECRET (header or query).
+  // Auth: allow Vercel scheduled runs OR callers that know CRON_SECRET (header or ?secret=)
   const isVercelCron = Boolean(req.headers['x-vercel-cron']);
   const headerSecret = req.headers['x-cron-secret'];
   const querySecret  = (req.query?.secret || '').toString();
@@ -130,50 +129,73 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // ---- your existing logic continues here ----
+  // Select topic
   const override = (req.query?.topic || '').toString().toLowerCase(); // gm|roast|market|degen|merch
   const topic = chooseTopic(override);
-  // (your dry-run block starts next; leave it as-is)
-}
 
- // Dry run = preview only (never throw)
-if (req.query?.dry) {
-  try {
-    const body = await generateBody(topic);
-    const text = `${body} ${SITE}`;
-    return res.status(200).json({
-      ok: true,
-      mode: "dry",
-      topic,
-      openaiKeyPresent: !!process.env.OPENAI_API_KEY,
-      willAttachMedia: topic === "merch",
-      text
-    });
-  } catch (e) {
-    console.error("[DRY RUN ERROR]", e?.stack || e?.message || e);
-    // Always respond in dry-run, even if generation failed
-    const text = `${pick(FB[topic] || FB.roast)} ${SITE}`;
-    return res.status(200).json({
-      ok: true,
-      mode: "dry-fallback",
-      topic,
-      openaiKeyPresent: !!process.env.OPENAI_API_KEY,
-      willAttachMedia: false,
-      text
-    });
+  // --- Dry run = preview only (never crash) ---
+  if (req.query?.dry) {
+    try {
+      const body = await generateBody(topic);
+      const text = `${body} ${SITE}`;
+      return res.status(200).json({
+        ok: true,
+        mode: "dry",
+        topic,
+        openaiKeyPresent: !!process.env.OPENAI_API_KEY,
+        willAttachMedia: topic === "merch",
+        text
+      });
+    } catch (e) {
+      console.error("[DRY RUN ERROR]", e?.stack || e?.message || e);
+      const text = `${pick(FB[topic] || FB.roast)} ${SITE}`;
+      return res.status(200).json({
+        ok: true,
+        mode: "dry-fallback",
+        topic,
+        openaiKeyPresent: !!process.env.OPENAI_API_KEY,
+        willAttachMedia: false,
+        text
+      });
+    }
   }
-}
 
+  // --- Live tweet ---
   try {
     const body = await generateBody(topic);
     const text = `${body} ${SITE}`;
 
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
-      appSecret: process.env.X_API_KEY_SECRET,         // keep your existing env names
+      appSecret: process.env.X_API_KEY_SECRET,
       accessToken: process.env.X_ACCESS_TOKEN,
       accessSecret: process.env.X_ACCESS_TOKEN_SECRET,
     });
+
+    // Attach image ONLY for merch topic
+    let media_ids;
+    if (topic === "merch" && MEDIA.length) {
+      try {
+        const m = MEDIA[Math.floor(Math.random() * MEDIA.length)];
+        const buf = await fetchImageBuffer(m.url);
+        const mediaId = await client.v1.uploadMedia(buf, { mimeType: m.type });
+        media_ids = [mediaId];
+      } catch (mErr) {
+        console.error("[MEDIA UPLOAD ERROR]", mErr?.data || mErr?.message || mErr);
+      }
+    }
+
+    const result = await client.v2.tweet(
+      text,
+      media_ids ? { media: { media_ids } } : undefined
+    );
+
+    return res.status(200).json({ ok: true, topic, text, media_ids, result });
+  } catch (e) {
+    console.error("[TWEET ERROR]", e?.data || e?.message || e);
+    return res.status(500).json({ ok: false, error: e?.data || e?.message || "tweet failed" });
+  }
+};
 
     // Attach image ONLY for merch topic
     let media_ids;
