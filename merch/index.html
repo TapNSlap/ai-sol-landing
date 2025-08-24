@@ -1,70 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI-SOL Merch</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#111; color:#fff; margin:0; padding:24px; text-align:center; }
-    h1 { margin: 0 0 24px; }
-    .grid {
-      max-width: 1200px; margin: 0 auto;
-      display:grid; gap:20px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    .merch-grid {
+      display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
     }
-    .item { background:#1a1a1a; border-radius:10px; padding:14px; }
-    .item img { width:100%; height:auto; border-radius:8px; display:block; }
-    .item p { margin:10px 0 0; color:#bbb; }
-    .ctas { margin:32px 0 0; }
-    .btn {
-      display:inline-block; margin:8px 10px; padding:14px 22px; border-radius:10px;
-      text-decoration:none; font-weight:700; font-size:18px;
+    .item {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
     }
-    .home { background:#1DA1F2; color:#fff; }
-    .xbtn { background:#111; color:#fff; border:1px solid #2a2f36; }
+    .item img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    a.back {
+      display: inline-block;
+      margin-top: 40px;
+      background: #1DA1F2;
+      padding: 14px 24px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
   <h1>🔥 AI-SOL Merch Preview 🔥</h1>
-
-  <div class="grid">
+  <div class="merch-grid">
     <div class="item">
-      <img src="crew-street.png" alt="Crew Street Merch" />
-      <p>The crew — New Assholes on the block.</p>
+      <img src="crew-street.png" alt="Crew Street">
+      <p>Group fit on the street.</p>
     </div>
     <div class="item">
-      <img src="couple-jeep.png" alt="Couple Jeep Merch" />
-      <p>Couple goals: loud and disrespectful.</p>
+      <img src="couple-jeep.png" alt="Couple Jeep">
+      <p>Couple flexing in the jeep.</p>
     </div>
     <div class="item">
-      <img src="lineup-wall.png" alt="Lineup Wall Merch" />
-      <p>Lineup look — walls can’t contain attitude.</p>
+      <img src="lineup-wall.png" alt="Lineup Wall">
+      <p>The full lineup at the wall.</p>
     </div>
     <div class="item">
-      <img src="hoodie-flat.png" alt="AI-SOL Hoodie" />
+      <img src="hoodie-flat.png" alt="Hoodie Flat">
       <p>Black Hoodie — Loud. Warm. Disrespectful.</p>
     </div>
     <div class="item">
-      <img src="tee-flat.png" alt="AI-SOL Tee" />
-      <p>T-Shirt — Basic? Not anymore.</p>
+      <img src="tee-flat.png" alt="Tee Flat">
+      <p>Basic? Not anymore.</p>
     </div>
     <div class="item">
-      <img src="mug.png" alt="AI-SOL Mug" />
-      <p>Mug — Coffee + Contempt. Perfect.</p>
+      <img src="mug.png" alt="Mug">
+      <p>Coffee + contempt. Perfect.</p>
     </div>
     <div class="item">
-      <img src="hats.png" alt="AI-SOL Hat" />
-      <p>Cap — Disrespect, but make it fashion.</p>
+      <img src="hats.png" alt="Hats">
+      <p>Disrespect, but make it fashion.</p>
     </div>
     <div class="item">
-      <img src="hoodie-solo.png" alt="AI-SOL Hoodie Solo" />
-      <p>Solo hoodie flex. Pure attitude.</p>
+      <img src="hoodie-solo.png" alt="Hoodie Solo">
+      <p>Solo hoodie flex.</p>
     </div>
   </div>
 
-  <div class="ctas">
-    <a class="btn home" href="/">← Back to Home</a>
-    <a class="btn xbtn" href="https://x.com/AISOL2774653" target="_blank" rel="noopener">Follow AI-SOL on X</a>
-  </div>
+  <a class="back" href="/">← Back to Home</a>
 </body>
 </html>
