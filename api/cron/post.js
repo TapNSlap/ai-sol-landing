@@ -116,23 +116,18 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  // --- TEMP DEBUG: add this block ---
-  if (req.query?.debug === '1') {
-    return res.status(200).json({
-      hasVercelHeader: !!req.headers['x-vercel-cron'],
-      hasHeaderSecret: !!req.headers['x-cron-secret'],
-      hasQuerySecret:  !!(req.query?.secret),
-      envSecretSet:    !!process.env.CRON_SECRET,
-      // do NOT include the actual secret values
-      method: req.method,
-      path:   req.url
-    });
-  }
-  // --- END TEMP DEBUG ---
+  // --- TEMP DEBUG: always print what we see ---
+  console.log("[CRON auth debug]", {
+    hasVercelHeader: !!req.headers["x-vercel-cron"],
+    headerSecret: !!req.headers["x-cron-secret"],
+    queryHasSecret: typeof req.query?.secret === "string" && req.query.secret.length > 0,
+    envSecretSet: !!process.env.CRON_SECRET,
+  });
 
-  const isVercelCron = !!req.headers['x-vercel-cron'];
-  const headerSecret = req.headers['x-cron-secret'];
-  const querySecret  = (req.query?.secret || '').toString();
+  // ✅ Accept EITHER: Vercel cron header OR your CRON_SECRET via header/query
+  const isVercelCron = !!req.headers["x-vercel-cron"];
+  const headerSecret = req.headers["x-cron-secret"];
+  const querySecret  = (req.query?.secret || "").toString();
 
   const ok =
     isVercelCron ||
@@ -140,18 +135,6 @@ module.exports = async function handler(req, res) {
     querySecret  === process.env.CRON_SECRET;
 
   if (!ok) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-    querySecret === process.env.CRON_SECRET;
-
-  if (!ok) {
-    console.log("[CRON unauthorized]", {
-      vercelHeader: !!req.headers["x-vercel-cron"],
-      headerSecret,
-      querySecret,
-      envSecretSet: !!process.env.CRON_SECRET,
-    });
     return res.status(401).json({ error: "Unauthorized" });
   }
 
