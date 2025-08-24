@@ -112,15 +112,23 @@ async function generateBody(topic) {
 
 // ----------- MEDIA HELPERS -----------
 async function fetchImageBuffer(url) {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`Image fetch failed ${r.status}`);
-  const ab = await r.arrayBuffer();
-  return Buffer.from(ab);
+  try {
+    const r = await fetch(url);
+    if (!r.ok) {
+      console.error("[IMAGE FETCH ERROR]", r.status, url);
+      return null; // don't throw; caller will skip media
+    }
+    const ab = await r.arrayBuffer();
+    return Buffer.from(ab);
+  } catch (e) {
+    console.error("[IMAGE FETCH ERROR]", e?.message || e, url);
+    return null; // don't throw
+  }
 }
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  // Auth: allow Vercel scheduled runs OR callers that know CRON_SECRET (header or ?secret=)
+  // Auth: scheduled runs OR callers that know CRON_SECRET (header or ?secret=)
   const isVercelCron = Boolean(req.headers['x-vercel-cron']);
   const headerSecret = req.headers['x-cron-secret'];
   const querySecret  = (req.query?.secret || '').toString();
@@ -133,11 +141,11 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Select topic
+  // Topic
   const override = (req.query?.topic || '').toString().toLowerCase(); // gm|roast|market|degen|merch
   const topic = chooseTopic(override);
 
-  // --- Dry run = preview only (never crash) ---
+  // --- Dry run (never crash) ---
   if (req.query?.dry) {
     try {
       const body = await generateBody(topic);
@@ -164,10 +172,12 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // --- Live tweet ---
+  // --- Live tweet (NEVER 500; returns 200 with error details) ---
+  const resultPayload = { ok: false, topic, media_ids: undefined, text: "", error: null };
   try {
     const body = await generateBody(topic);
     const text = `${body} ${SITE}`;
+    resultPayload.text = text;
 
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY,
@@ -177,6 +187,60 @@ module.exports = async function handler(req, res) {
     });
 
     // Attach image ONLY for merch topic
+    let media_ids;
+    if (topic === "merch") {
+      try {
+        // pick a random merch image (your URLs must include /public if your site serves them that way)
+        const MEDIA = [
+          { url: `${SITE}/public/merch/hoodie-flat.png`,  type: "image/png" },
+          { url: `${SITE}/public/merch/hoodie-solo.png`,  type: "image/png" },
+          { url: `${SITE}/public/merch/tee-flat.png`,     type: "image/png" },
+          { url: `${SITE}/public/merch/mug.png`,          type: "image/png" },
+          { url: `${SITE}/public/merch/hats.png`,         type: "image/png" },
+          { url: `${SITE}/public/merch/crew-street.png`,  type: "image/png" },
+          { url: `${SITE}/public/merch/lineup-wall.png`,  type: "image/png" },
+          { url: `${SITE}/public/merch/couple-jeep.png`,  type: "image/png" }
+        ];
+        const m = MEDIA[Math.floor(Math.random() * MEDIA.length)];
+        const buf = await fetchImageBuffer(m.url);
+        if (buf) {
+          const mediaId = await client.v1.uploadMedia(buf, { mimeType: m.type });
+          media_ids = [mediaId];
+        } else {
+          console.warn("[MEDIA SKIPPED] no buffer for", m.url);
+        }
+      } catch (mErr) {
+        console.error("[MEDIA UPLOAD ERROR]", mErr?.data || mErr?.message || mErr);
+      }
+    }
+
+    const tweet = await client.v2.tweet(
+      text,
+      media_ids ? { media: { media_ids } } : undefined
+    );
+
+    resultPayload.ok = true;
+    resultPayload.media_ids = media_ids;
+    resultPayload.result = tweet;
+    return res.status(200).json(resultPayload);
+
+  } catch (e) {
+    // NEVER 500; surface the reason to you
+    const msg = e?.data || e?.message || "tweet failed";
+    console.error("[TWEET ERROR]", msg);
+    resultPayload.error = msg;
+
+    // also include quick env sanity in the response
+    resultPayload.env = {
+      hasKey: !!process.env.X_API_KEY,
+      hasKeySecret: !!process.env.X_API_KEY_SECRET,
+      hasAccess: !!process.env.X_ACCESS_TOKEN,
+      hasAccessSecret: !!process.env.X_ACCESS_TOKEN_SECRET
+    };
+    return res.status(200).json(resultPayload);
+  }
+};
+   // Attach image ONLY for merch topic
     let media_ids;
     if (topic === "merch" && MEDIA.length) {
       try {
