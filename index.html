@@ -183,88 +183,48 @@ form.addEventListener('submit', async (e) => {
       });
     }); 
 </script>
- <!-- ==== AI‑SOL Merch (forced full‑width, below sidebar) ==== -->
-<div id="aisol-merch-block"
-     style="
-       clear:both;               /* break out of floats */
-       float:none;               /* don't float like the sidebar */
-       display:block;
-       width:100%;
-       flex:0 0 100%;            /* if parent is flex */
-       order:999;                /* if parent orders children */
-       grid-column:1 / -1;       /* if parent is CSS grid */
-       max-width:1100px; margin:60px auto 32px; padding:0 16px;
-       font-family:system-ui,Arial,sans-serif;
-     ">
+  <!-- Merch Section -->
+<section id="aisol-merch" style="max-width:900px;margin:60px auto;text-align:center;clear:both;">
+  <h2 style="margin-bottom:20px;">AI-SOL Merch</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
 
-  <h2 style="text-align:center;font-size:32px;margin:0 0 12px;color:#fff;">
-    AI‑SOL Merch (coming soon)
-  </h2>
-  <p style="text-align:center;margin:0 0 28px;color:#aab0b7;">
-    Preview the drip. Shop opens soon™.
-  </p>
+    <div style="background:#111;padding:15px;border-radius:8px;">
+      <img src="/merch/hoodie.png" alt="AI-SOL Hoodie" style="max-width:100%;border-radius:6px;">
+      <h3 style="margin-top:10px;">Hoodie</h3>
+      <p>Black. Loud. Warm. Disrespectful.</p>
+      <button disabled>Coming Soon</button>
+    </div>
 
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-              gap:24px;justify-items:center;">
+    <div style="background:#111;padding:15px;border-radius:8px;">
+      <img src="/merch/tee.png" alt="AI-SOL T-Shirt" style="max-width:100%;border-radius:6px;">
+      <h3 style="margin-top:10px;">T-Shirt</h3>
+      <p>Basic? Not anymore.</p>
+      <button disabled>Coming Soon</button>
+    </div>
 
-    <!-- Hoodie -->
-    <article style="max-width:260px;width:100%;border:1px solid #2a2f36;border-radius:12px;
-                    padding:14px;background:#0f1419;">
-      <img src="/merch/hoodie.png" alt="AI‑SOL Hoodie"
-           style="width:100%;border-radius:8px;display:block;background:#0b0f13;">
-      <h3 style="margin:12px 0 6px;font-size:18px;color:#fff;">Hoodie</h3>
-      <p style="margin:0 0 12px;color:#aab0b7;">Black. Loud. Warm. Disrespectful.</p>
-      <button disabled style="width:100%;padding:10px;border-radius:8px;border:0;background:#111;
-                              color:#fff;opacity:.6;cursor:not-allowed;">Coming Soon</button>
-    </article>
+    <div style="background:#111;padding:15px;border-radius:8px;">
+      <img src="/merch/mug.png" alt="AI-SOL Mug" style="max-width:100%;border-radius:6px;">
+      <h3 style="margin-top:10px;">Mug</h3>
+      <p>Coffee + contempt. Perfect.</p>
+      <button disabled>Coming Soon</button>
+    </div>
 
-    <!-- Tee -->
-    <article style="max-width:260px;width:100%;border:1px solid #2a2f36;border-radius:12px;
-                    padding:14px;background:#0f1419;">
-      <img src="/merch/tee.png" alt="AI‑SOL T‑Shirt"
-           style="width:100%;border-radius:8px;display:block;background:#0b0f13;">
-      <h3 style="margin:12px 0 6px;font-size:18px;color:#fff;">T‑Shirt</h3>
-      <p style="margin:0 0 12px;color:#aab0b7;">Basic? Not anymore.</p>
-      <button disabled style="width:100%;padding:10px;border-radius:8px;border:0;background:#111;
-                              color:#fff;opacity:.6;cursor:not-allowed;">Coming Soon</button>
-    </article>
-
-    <!-- Mug -->
-    <article style="max-width:260px;width:100%;border:1px solid #2a2f36;border-radius:12px;
-                    padding:14px;background:#0f1419;">
-      <img src="/merch/mug.png" alt="AI‑SOL Mug"
-           style="width:100%;border-radius:8px;display:block;background:#0b0f13;">
-      <h3 style="margin:12px 0 6px;font-size:18px;color:#fff;">Mug</h3>
-      <p style="margin:0 0 12px;color:#aab0b7;">Coffee + contempt. Perfect.</p>
-      <button disabled style="width:100%;padding:10px;border-radius:8px;border:0;background:#111;
-                              color:#fff;opacity:.6;cursor:not-allowed;">Coming Soon</button>
-    </article>
-
-    <!-- Hat -->
-    <article style="max-width:260px;width:100%;border:1px solid #2a2f36;border-radius:12px;
-                    padding:14px;background:#0f1419;">
-      <img src="/merch/hat.png" alt="AI‑SOL Hat"
-           style="width:100%;border-radius:8px;display:block;background:#0b0f13;">
-      <h3 style="margin:12px 0 6px;font-size:18px;color:#fff;">Cap</h3>
-      <p style="margin:0 0 12px;color:#aab0b7;">Disrespect, but make it fashion.</p>
-      <button disabled style="width:100%;padding:10px;border-radius:8px;border:0;background:#111;
-                              color:#fff;opacity:.6;cursor:not-allowed;">Coming Soon</button>
-    </article>
+    <div style="background:#111;padding:15px;border-radius:8px;">
+      <img src="/merch/hat.png" alt="AI-SOL Hat" style="max-width:100%;border-radius:6px;">
+      <h3 style="margin-top:10px;">Cap</h3>
+      <p>Disrespect, but make it fashion.</p>
+      <button disabled>Coming Soon</button>
+    </div>
 
   </div>
-</div>
 
-<!-- Follow on X (centered under merch) -->
-<div id="aisol-follow"
-     style="clear:both; float:none; display:block; width:100%; flex:0 0 100%;
-            order:1000; grid-column:1 / -1; text-align:center; margin:20px 0 60px;">
-  <a href="https://x.com/AISOL2774653" target="_blank" rel="noopener"
-     style="display:inline-block;padding:14px 24px;border-radius:10px;
-            background:#1DA1F2;color:#fff;text-decoration:none;font-weight:700;font-size:18px;">
-    Follow AI‑SOL on X
-  </a>
-</div>
-<!-- ==== /AI‑SOL Merch ==== -->
- 
+  <!-- Follow on X Button -->
+  <div style="margin-top:40px;">
+    <a href="https://x.com/AISOL2774653" target="_blank"
+       style="display:inline-block;background:#1DA1F2;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
+      Follow AI-SOL on X
+    </a>
+  </div>
+</section>
 </body>
 </html>
