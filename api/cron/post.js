@@ -4,14 +4,14 @@ const { TwitterApi } = require("twitter-api-v2");
 // ----------- CONFIG -----------
 const SITE = process.env.SITE_URL || "https://ai-sol.tapnslap.ai";
 const MEDIA = [
-  { url: `${SITE}/public/merch/hoodie-flat.png`, type: "image/png" },
-  { url: `${SITE}/public/merch/tee-flat.png`,    type: "image/png" },
-  { url: `${SITE}/public/merch/mug.png`,    type: "image/png" },
-  { url: `${SITE}/public/merch/hats.png`,    type: "image/png" }
-  { url: `${SITE}/public/merch/hoodie-solo.png`,    type: "image/png" }
-  { url: `${SITE}/public/merch/crew-street.png`,    type: "image/png" }
-  { url: `${SITE}/public/merch/lineup-wall.png`,    type: "image/png" }
-  { url: `${SITE}/public/merch/couple-jeep.png`,    type: "image/png" }
+  { url: `${SITE}/public/merch/hoodie-flat.png`,  type: "image/png" },
+  { url: `${SITE}/public/merch/hoodie-solo.png`,  type: "image/png" },
+  { url: `${SITE}/public/merch/tee-flat.png`,     type: "image/png" },
+  { url: `${SITE}/public/merch/mug.png`,          type: "image/png" },
+  { url: `${SITE}/public/merch/hats.png`,         type: "image/png" },
+  { url: `${SITE}/public/merch/crew-street.png`,  type: "image/png" },
+  { url: `${SITE}/public/merch/lineup-wall.png`,  type: "image/png" },
+  { url: `${SITE}/public/merch/couple-jeep.png`,  type: "image/png" }
 ];
 
 // Merch probability (0.0–1.0). At 0.15 ≈ 15%.
