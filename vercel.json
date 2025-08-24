@@ -1,6 +1,20 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "crons": [
-    { "path": "/api/cron/post", "schedule": "0 14 * * *" },
-    { "path": "/api/cron/post", "schedule": "0 1 * * *" }
+    {
+      "path": "/api/cron/post",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/post",
+      "schedule": "0 1 * * *"
+    }
+  ],
+  "routes": [
+    { "src": "/merch", "dest": "/merch.html" },
+    { "src": "/merch.html", "dest": "/merch.html" },
+    { "src": "/thankyou", "dest": "/thankyou.html" },
+    { "src": "/thankyou.html", "dest": "/thankyou.html" }
   ]
 }
