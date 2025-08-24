@@ -1,1 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-SOL Merch</title>
+  <link rel="icon" href="/ai-sol-logo.png" />
+  <style>
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, Arial;
+      background: #0a1218;
+      color: #e9f1f1;
+      text-align: center;
+      padding: 32px;
+    }
 
+    h1 {
+      margin-bottom: 24px;
+      font-size: clamp(28px, 5vw, 46px);
+    }
+
+    p {
+      margin: 0 auto 32px;
+      max-width: 58ch;
+      color: #9fb2b5;
+      font-size: clamp(14px, 2.5vw, 16px);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform .3s ease;
+      cursor: pointer;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.04);
+    }
+
+    .cta {
+      display: inline-block;
+      margin-top: 40px;
+      padding: 14px 24px;
+      border-radius: 10px;
+      background: #00e6ff;
+      color: #001217;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 AI-SOL Merch</h1>
+  <p>Rep the meme coin — hoodies, tees, and caps.</p>
+
+  <div class="gallery">
+    <img src="/models/group.png" alt="Group shot wearing AI-SOL merch">
+    <img src="/models/male-hoodie.png" alt="Male model in AI-SOL hoodie">
+    <img src="/models/female-hoodie-mug.png" alt="Female model with hoodie and mug">
+  </div>
+
+  <a href="/" class="cta">⬅ Back to Home</a>
+</body>
+</html>
