@@ -116,13 +116,33 @@ async function fetchImageBuffer(url) {
 
 // ----------- HANDLER -----------
 module.exports = async function handler(req, res) {
-  const isVercelCron = !!req.headers["x-vercel-cron"];
-  const headerSecret = req.headers["x-cron-secret"];
-  const querySecret  = (req.query?.secret || "").toString();
+  // --- TEMP DEBUG: add this block ---
+  if (req.query?.debug === '1') {
+    return res.status(200).json({
+      hasVercelHeader: !!req.headers['x-vercel-cron'],
+      hasHeaderSecret: !!req.headers['x-cron-secret'],
+      hasQuerySecret:  !!(req.query?.secret),
+      envSecretSet:    !!process.env.CRON_SECRET,
+      // do NOT include the actual secret values
+      method: req.method,
+      path:   req.url
+    });
+  }
+  // --- END TEMP DEBUG ---
+
+  const isVercelCron = !!req.headers['x-vercel-cron'];
+  const headerSecret = req.headers['x-cron-secret'];
+  const querySecret  = (req.query?.secret || '').toString();
 
   const ok =
     isVercelCron ||
     headerSecret === process.env.CRON_SECRET ||
+    querySecret  === process.env.CRON_SECRET;
+
+  if (!ok) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
     querySecret === process.env.CRON_SECRET;
 
   if (!ok) {
